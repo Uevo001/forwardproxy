@@ -9,7 +9,7 @@ defaults:
 jobs:
   build_caddy_with_naive:
     runs-on: ubuntu-latest
-    container: debian-latest
+    container: debian:latest
     env:
       BUNDLE: caddy-forwardproxy-naive
     steps:
