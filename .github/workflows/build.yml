@@ -1,8 +1,6 @@
 name: Build
 on:
-  push:
-    branches: [naive]
-    paths-ignore: [README.md]
+  workflow_dispatch: 
   release:
     types: [published]
 defaults:
@@ -10,7 +8,8 @@ defaults:
     shell: bash
 jobs:
   build_caddy_with_naive:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
+    container: debian-latest
     env:
       BUNDLE: caddy-forwardproxy-naive
     steps:
@@ -24,9 +23,9 @@ jobs:
       - run: git -C .caddy-bbr apply "$GITHUB_WORKSPACE/caddy-sing-quic-bbrv1.patch" "$GITHUB_WORKSPACE/caddy-read-idle-timeout.patch"
       - uses: actions/setup-go@v5
         with:
-          go-version: ^1.26.x
+          go-version: 'stable'
       - run: go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
-      - run: ~/go/bin/xcaddy build "$CADDY_VERSION" --replace "github.com/caddyserver/caddy/v2=$GITHUB_WORKSPACE/.caddy-bbr" --with "github.com/caddyserver/forwardproxy=$GITHUB_WORKSPACE"
+      - run: ~/go/bin/xcaddy build "$CADDY_VERSION" --replace "github.com/caddyserver/caddy/v2=$GITHUB_WORKSPACE/.caddy-bbr" --with "github.com/caddyserver/forwardproxy=$GITHUB_WORKSPACE" --with "github.com/caddy-dns/cloudflare"
       - name: Pack naiveproxy assets
         run: |
           mkdir ${{ env.BUNDLE }}
